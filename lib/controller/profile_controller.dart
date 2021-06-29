@@ -1,9 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_task_app/model/Profile.dart';
 import 'package:get/get.dart';
 
 class ProfileController extends GetxController {
+  var profileCollection = FirebaseFirestore.instance.collection('Profile');
+  //var setAge = 100.obs;
+  List<Profile> usertList = List<Profile>.empty(growable: true).obs;
+  @override
+  void onInit() {
+    fetchData(100);
+    super.onInit();
+  }
+
   void addDataToServer() {
-    var profileCollection = FirebaseFirestore.instance.collection('Profile');
     // adding dummy data in server
     profileCollection.add(
       {
@@ -140,5 +149,24 @@ class ProfileController extends GetxController {
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkHdpaMtNroRoemjX9boEC5ZoEg-vykP0yFA&usqp=CAU',
       },
     );
+  }
+
+  Future<void> fetchData(double setAge) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('Profile')
+        .where('Age', isLessThanOrEqualTo: setAge)
+        .get();
+    List<Profile> tempUsertList = List<Profile>.empty(growable: true);
+
+    snapshot.docs.forEach((element) {
+      tempUsertList.add(Profile(
+        age: element['Age'],
+        name: element['Name'],
+        gender: element['Gender'],
+        imageUrl: element['imageUrl'],
+      ));
+    });
+    usertList = tempUsertList;
+    update();
   }
 }
