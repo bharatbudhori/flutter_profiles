@@ -4,12 +4,21 @@ import 'package:get/get.dart';
 
 class ProfileController extends GetxController {
   var profileCollection = FirebaseFirestore.instance.collection('Profile');
-  //var setAge = 100.obs;
+  List<double> setAge = List<double>.empty(growable: true).obs;
+
   List<Profile> usertList = List<Profile>.empty(growable: true).obs;
   @override
-  void onInit() {
-    fetchData(100);
+  void onInit() async {
+    if (setAge.isEmpty) {
+      setAge.add(100);
+    }
+    await fetchData(100);
     super.onInit();
+  }
+
+  void updateAge(double x) {
+    setAge[0] = x;
+    update();
   }
 
   void addDataToServer() {
